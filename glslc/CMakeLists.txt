@@ -34,6 +34,6 @@ target_include_directories(glslc PUBLIC ${glslang_SOURCE_DIR})
 target_link_libraries(glslc PRIVATE
   glslang SPIRV    # Glslang libraries
   $<$<BOOL:${SHADERC_ENABLE_WGSL_OUTPUT}>:libtint>      # Tint libraries, optional
-  shaderc_util shaderc                                  # internal Shaderc libraries
+  shaderc_util                                  # internal Shaderc libraries
   ${CMAKE_THREAD_LIBS_INIT})
 
