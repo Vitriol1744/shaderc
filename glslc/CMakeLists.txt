@@ -29,18 +29,7 @@ add_library(glslc STATIC
   src/dependency_info.h
 )
 
-shaderc_default_compile_options(glslc)
 target_include_directories(glslc PUBLIC ${glslang_SOURCE_DIR})
-
-if (SHADERC_ENABLE_WGSL_OUTPUT)
-  if (IS_DIRECTORY "${tint_SOURCE_DIR}/include")
-    target_include_directories(glslc PRIVATE "${tint_SOURCE_DIR}/include")
-    target_include_directories(glslc PRIVATE "${tint_SOURCE_DIR}")
-  endif()
-  # Turn on features in the tint/tint.h header
-  add_definitions(-DTINT_BUILD_SPV_READER=1 -DTINT_BUILD_WGSL_WRITER=1)
-  add_definitions(-DSHADERC_ENABLE_WGSL_OUTPUT=1)
-endif(SHADERC_ENABLE_WGSL_OUTPUT)
 
 target_link_libraries(glslc PRIVATE
   glslang SPIRV    # Glslang libraries
@@ -48,27 +37,3 @@ target_link_libraries(glslc PRIVATE
   shaderc_util shaderc                                  # internal Shaderc libraries
   ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(glslc_exe src/main.cc)
-shaderc_default_compile_options(glslc_exe)
-target_include_directories(glslc_exe PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/.. ${spirv-tools_SOURCE_DIR}/include)
-set_target_properties(glslc_exe PROPERTIES OUTPUT_NAME glslc)
-target_link_libraries(glslc_exe PRIVATE glslc shaderc_util shaderc)
-add_dependencies(glslc_exe build-version)
-
-shaderc_add_tests(
-  TEST_PREFIX glslc
-  LINK_LIBS glslc shaderc_util shaderc
-  TEST_NAMES
-    file
-    resource_parse
-    stage)
-
-shaderc_add_asciidoc(glslc_doc_README README)
-
-if(SHADERC_ENABLE_INSTALL)
-  install(TARGETS glslc_exe
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif(SHADERC_ENABLE_INSTALL)
-
-add_subdirectory(test)

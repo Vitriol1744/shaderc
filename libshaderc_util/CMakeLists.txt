@@ -37,7 +37,6 @@ add_library(shaderc_util STATIC
   src/version_profile.cc
 )
 
-shaderc_default_compile_options(shaderc_util)
 target_include_directories(shaderc_util
   PUBLIC include PRIVATE ${glslang_SOURCE_DIR})
 # We use parts of Glslang's HLSL compilation interface, which
@@ -49,41 +48,3 @@ target_link_libraries(shaderc_util PRIVATE
   glslang SPIRV
   SPIRV-Tools-opt ${CMAKE_THREAD_LIBS_INIT})
 
-shaderc_add_tests(
-  TEST_PREFIX shaderc_util
-  LINK_LIBS shaderc_util
-  TEST_NAMES
-    counting_includer
-    string_piece
-    format
-    file_finder
-    io_shaderc
-    message
-    mutex
-    version_profile)
-
-if(${SHADERC_ENABLE_TESTS})
-  target_include_directories(shaderc_util_counting_includer_test
-    PRIVATE ${glslang_SOURCE_DIR})
-  target_include_directories(shaderc_util_version_profile_test
-    PRIVATE ${glslang_SOURCE_DIR})
-endif()
-
-shaderc_add_tests(
-  TEST_PREFIX shaderc_util
-  LINK_LIBS shaderc_util
-  INCLUDE_DIRS
-    ${glslang_SOURCE_DIR}
-    ${spirv-tools_SOURCE_DIR}/include
-  TEST_NAMES
-    compiler)
-
-# This target copies content of testdata into the build directory.
-add_custom_target(testdata COMMAND
-  ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/testdata/copy-to-build.cmake
-  COMMENT "Copy testdata into build directory")
-
-if(${SHADERC_ENABLE_TESTS})
-  add_dependencies(shaderc_util_file_finder_test testdata)
-  add_dependencies(shaderc_util_io_shaderc_test testdata)
-endif()
